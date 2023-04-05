@@ -24,6 +24,7 @@ if [ -z "$1" ]
     echo "  up -d              Create and start containers"
     echo "  start              Start services"
     echo "  stop               Stop services"
+    echo "  down               Remove services"
     exit 1
 fi
 

@@ -178,6 +178,7 @@ cat << EOF
 ------------------[ Final Setup Instructions ]-----------------
 
 Open Grafana at http://localhost:9000/ ... use admin/admin for login.
+  - If you are running podman rootless you will need to chown the ./grafana folder with your SUID/SGID
 
 Follow these instructions for *Grafana Setup*:
 

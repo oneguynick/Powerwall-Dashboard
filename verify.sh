@@ -79,7 +79,7 @@ else
     echo -e $GOOD
 fi
 echo -e -n "${dim} - Container ($CONTAINER): "
-RUNNING=$(docker inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
+RUNNING=$(podman inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
 if [ "$RUNNING" = "true" ]; then
     echo -e $GOOD
     echo -e -n "${dim} - Service (port $PORT): "
@@ -126,10 +126,10 @@ else
     echo -e $GOOD
 fi
 echo -e -n "${dim} - Container ($CONTAINER): "
-RUNNING=$(docker inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
+RUNNING=$(podman inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
 if [ "$RUNNING" = "true" ]; then
   echo -e $GOOD
-  VER=`docker exec -it telegraf telegraf --version`
+  VER=`podman exec -it telegraf telegraf --version`
 else
   echo -e "${alert}ERROR: Stopped${normal}"
 fi
@@ -150,13 +150,13 @@ else
     echo -e $GOOD
 fi
 echo -e -n "${dim} - Container ($CONTAINER): "
-RUNNING=$(docker inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
+RUNNING=$(podman inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
 if [ "$RUNNING" = "true" ]; then
     echo -e $GOOD
     echo -e -n "${dim} - Service (port $PORT): "
     if running http://localhost:$PORT/ping 204 1 2>/dev/null;  then
         echo -e $GOOD
-        VER=`docker exec --tty influxdb sh -c "influx -version" 2>/dev/null`
+        VER=`podman exec --tty influxdb sh -c "influx -version" 2>/dev/null`
     else
         echo -e "${alert}ERROR: Not Listening${normal}"
     fi
@@ -184,17 +184,17 @@ else
     fi
 fi
 echo -e -n "${dim} - Container ($CONTAINER): "
-RUNNING=$(docker inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
+RUNNING=$(podman inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
 if [ "$RUNNING" = "true" ]; then
     echo -e $GOOD
-    VER=`docker exec -it grafana grafana-cli --version 2>/dev/null`
+    VER=`podman exec -it grafana grafana-cli --version 2>/dev/null`
     echo -e -n "${dim} - Service (port $PORT): "
     if running http://localhost:$PORT/login 200 1 2>/dev/null;  then
         echo -e $GOOD
     else
         echo -e "${alert}ERROR: Not Listening - Logs:${alertdim}"
         echo -e "---"
-        docker logs grafana 2>&1 | tail -11
+        podman logs grafana 2>&1 | tail -11
         echo -e "---${normal}"
     fi
 else
@@ -218,7 +218,7 @@ else
     echo -e $GOOD
 fi
 echo -e -n "${dim} - Container ($CONTAINER): "
-RUNNING=$(docker inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
+RUNNING=$(podman inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
 if [ "$RUNNING" = "true" ]; then
     echo -e $GOOD
     echo -e -n "${dim} - Service (port $PORT): "
@@ -233,7 +233,7 @@ if [ "$RUNNING" = "true" ]; then
     else
         echo -e "${alert}ERROR: Not Listening - Logs:${alertdim}"
         echo -e "---"
-        docker logs weather411 2>&1 | tail -11
+        podman logs weather411 2>&1 | tail -11
         echo -e "---${normal}"
     fi
 else
@@ -258,7 +258,7 @@ if [ -f powerwall.extend.yml ]; then
         echo -e $GOOD
     fi
     echo -e -n "${dim} - Container ($CONTAINER): "
-    RUNNING=$(docker inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
+    RUNNING=$(podman inspect --format="{{.State.Running}}" $CONTAINER 2>/dev/null)
     if [ "$RUNNING" = "true" ]; then
         echo -e $GOOD
         echo -e -n "${dim} - Service (port $PORT): "
@@ -273,7 +273,7 @@ if [ -f powerwall.extend.yml ]; then
         else
             echo -e "${alert}ERROR: Not Listening - Logs:${alertdim}"
             echo -e "---"
-            docker logs weather411 2>&1 | tail -11
+            podman logs weather411 2>&1 | tail -11
             echo -e "---${normal}"
         fi
     else

@@ -2,23 +2,24 @@
 #
 # Interactive Weather Setup Script for Powerwall Dashboard
 # by Jason Cox - 20 Aug 2022
+# updates by Nicholas Schmidt - 5 April 2023
 
 # Files
 CONF_FILE="weather/weather411.conf"
 CONF_SRC="weather/weather411.conf.sample"
 
 # Verify not running as root
-if [ "$EUID" -eq 0 ]; then 
+if [ "$EUID" -eq 0 ]; then
   echo "ERROR: Running this as root will cause permission issues."
   echo ""
-  echo "Please ensure your local user in in the docker group and run without sudo."
-  echo "   sudo usermod -aG docker \$USER"
+  echo "Please ensure your local user in in the podman group and run without sudo."
+  echo "   sudo usermod -aG podman \$USER"
   echo "   $0"
   echo ""
   exit 1
 fi
 
-# Docker Dependency Check - moved to compose-dash.sh, 14/10/22
+# podman Dependency Check - moved to compose-dash.sh, 14/10/22
 
 # Setup Weather?
 echo "Weather Data Setup"
@@ -46,7 +47,7 @@ else
     exit 0
 fi
 
-# Configuration File 
+# Configuration File
 if [ -f ${CONF_FILE} ]; then
     echo "Existing Configuration Founded"
     echo ""
@@ -83,7 +84,7 @@ if [ ! -f ${CONF_FILE} ]; then
     echo "   3. Click on 'API Keys' tab and copy 'Key' value and paste below."
     echo ""
     read -p 'Enter OpenWeatherMap API Key: ' APIKEY
-    if [ -z "${APIKEY}" ]; then 
+    if [ -z "${APIKEY}" ]; then
         echo "ERROR: A key is required. Exiting now."
         exit 0
     fi
@@ -92,12 +93,12 @@ if [ ! -f ${CONF_FILE} ]; then
     echo "   For help go to https://jasonacox.github.io/Powerwall-Dashboard/location.html"
     echo ""
     read -p 'Enter Latitude: ' LAT
-    if [ -z "${LAT}" ]; then 
+    if [ -z "${LAT}" ]; then
         echo "ERROR: Valid coordinates are required. Exiting now."
         exit 0
     fi
     read -p 'Enter Longitude: ' LON
-    if [ -z "${LON}" ]; then 
+    if [ -z "${LON}" ]; then
         echo "ERROR: Valid coordinates are required. Exiting now."
         exit 0
     fi
@@ -144,7 +145,7 @@ if [[ "${1}" == "setup" ]]; then
     echo "Weather Configuration Complete"
     echo ""
 else
-    # run docker compose in current shell.
+    # run podman compose in current shell.
     . compose-dash.sh up -d
     echo "Weather Setup Complete"
     echo ""

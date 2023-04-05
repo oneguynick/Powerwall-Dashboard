@@ -2,6 +2,7 @@
 #
 # Interactive Setup Script for Powerwall Dashboard
 # by Jason Cox - 21 Jan 2022
+# updates by Nicholas Schmidt - 5 April 2023
 
 # Stop on Errors
 set -e
@@ -17,11 +18,11 @@ echo "Powerwall Dashboard (v${VERSION}) - SETUP"
 echo "-----------------------------------------"
 
 # Verify not running as root
-if [ "$EUID" -eq 0 ]; then 
+if [ "$EUID" -eq 0 ]; then
   echo "ERROR: Running this as root will cause permission issues."
   echo ""
-  echo "Please ensure your local user in in the docker group and run without sudo."
-  echo "   sudo usermod -aG docker \$USER"
+  echo "Please ensure your local user in in the podman group and run without sudo."
+  echo "   sudo usermod -aG podman \$USER"
   echo "   $0"
   echo ""
   exit 1
@@ -35,16 +36,16 @@ running() {
     [[ $status == ${code} ]]
 }
 
-# Docker Dependency Check 
-if ! docker info > /dev/null 2>&1; then
-    echo "ERROR: docker is not available or not runnning."
-    echo "This script requires docker, please install and try again."
+# Podman Dependency Check
+if ! podman info > /dev/null 2>&1; then
+    echo "ERROR: podman is not available or not runnning."
+    echo "This script requires podman, please install and try again."
     exit 1
 fi
-if ! docker-compose version > /dev/null 2>&1; then
-    if ! docker compose version > /dev/null 2>&1; then
-        echo "ERROR: docker-compose is not available or not runnning."
-        echo "This script requires docker-compose or docker compose."
+if ! podman-compose version > /dev/null 2>&1; then
+    if ! podman compose version > /dev/null 2>&1; then
+        echo "ERROR: podman-compose is not available or not runnning."
+        echo "This script requires podman-compose or podman compose."
         echo "Please install and try again."
         exit 1
     fi
@@ -81,7 +82,7 @@ echo "Timezone (leave blank for ${CURRENT})"
 read -p 'Enter Timezone: ' TZ
 echo ""
 
-# Powerwall Credentials 
+# Powerwall Credentials
 if [ -f ${PW_ENV_FILE} ]; then
     echo "Current Powerwall Credentials:"
     echo ""
@@ -114,7 +115,7 @@ if [ ! -f ${GF_ENV_FILE} ]; then
     cp "${GF_ENV_FILE}.sample" "${GF_ENV_FILE}"
 fi
 
-# Create default docker compose env file if needed.
+# Create default podman compose env file if needed.
 if [ ! -f ${COMPOSE_ENV_FILE} ]; then
     cp "${COMPOSE_ENV_FILE}.sample" "${COMPOSE_ENV_FILE}"
 fi
@@ -125,12 +126,12 @@ if [ ! -f ${TELEGRAF_LOCAL} ]; then
 fi
 
 echo ""
-if [ -z "${TZ}" ]; then 
-    echo "Using ${CURRENT} timezone..."; 
+if [ -z "${TZ}" ]; then
+    echo "Using ${CURRENT} timezone...";
     ./tz.sh "${CURRENT}";
-else 
-    echo "Setting ${TZ} timezone..."; 
-    ./tz.sh "${TZ}"; 
+else
+    echo "Setting ${TZ} timezone...";
+    ./tz.sh "${TZ}";
 fi
 echo "-----------------------------------------"
 echo ""
@@ -140,7 +141,7 @@ if [ -f weather.sh ]; then
     ./weather.sh setup
 fi
 
-# Build Docker in current environment
+# Build Podman in current environment
 ./compose-dash.sh up -d
 echo "-----------------------------------------"
 
@@ -153,14 +154,14 @@ done
 echo " up!"
 sleep 2
 echo "Setup InfluxDB Data for Powerwall..."
-docker exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/influxdb.sql"
+podman exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/influxdb.sql"
 sleep 2
 # Execute Run-Once queries for initial setup.
 cd influxdb
-for f in run-once*.sql; do 
+for f in run-once*.sql; do
     if [ ! -f "${f}.done" ]; then
-        echo "Executing single run query $f file..."; 
-        docker exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/${f}"
+        echo "Executing single run query $f file...";
+        podman exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/${f}"
         echo "OK" > "${f}.done"
     fi
 done
@@ -169,7 +170,7 @@ cd ..
 # Restart weather411 to force a sample
 if [ -f weather/weather411.conf ]; then
     echo "Fetching local weather..."
-    docker restart weather411
+    podman restart weather411
 fi
 
 # Display Final Instructions

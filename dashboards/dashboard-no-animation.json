@@ -206,7 +206,7 @@
           "measurement": "http",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT \"mean_load_instant_power\" FROM \"http\" WHERE $timeFilter tz('America/Los_Angeles')",
+          "query": "SELECT \"mean_load_instant_power\" FROM \"http\" WHERE $timeFilter tz('America/Detroit')",
           "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
@@ -225,7 +225,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "alias": "Solar Energy",
@@ -262,7 +262,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "alias": "Powerwall",
@@ -282,7 +282,7 @@
           "measurement": "http",
           "orderByTime": "ASC",
           "policy": "autogen",
-          "query": "SELECT mean(from_pw) - mean(to_pw) FROM autogen.http WHERE $timeFilter GROUP BY time(5m) tz('America/Los_Angeles')",
+          "query": "SELECT mean(from_pw) - mean(to_pw) FROM autogen.http WHERE $timeFilter GROUP BY time(5m) tz('America/Detroit')",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series",
@@ -301,7 +301,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "alias": "Grid Usage",
@@ -327,7 +327,7 @@
           "measurement": "http",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(from_grid) - mean(to_grid) FROM autogen.http WHERE $timeFilter GROUP BY time(5m) tz('America/Los_Angeles')",
+          "query": "SELECT mean(from_grid) - mean(to_grid) FROM autogen.http WHERE $timeFilter GROUP BY time(5m) tz('America/Detroit')",
           "rawQuery": true,
           "refId": "D",
           "resultFormat": "time_series",
@@ -346,7 +346,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "alias": "Charge",
@@ -397,7 +397,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "datasource": {
@@ -539,7 +539,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "Powerwall",
@@ -603,7 +603,7 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "SELECT  (1+from_solar/abs(from_solar))*from_solar/2  FROM (SELECT integral(solar)/1000/3600 - integral(to_pw)/1000/3600 - integral(to_grid)/1000/3600  AS from_solar FROM autogen.http WHERE  $timeFilter tz('America/Los_Angeles'))",
+          "query": "SELECT  (1+from_solar/abs(from_solar))*from_solar/2  FROM (SELECT integral(solar)/1000/3600 - integral(to_pw)/1000/3600 - integral(to_grid)/1000/3600  AS from_solar FROM autogen.http WHERE  $timeFilter tz('America/Detroit'))",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -644,7 +644,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "alias": "From Grid",
@@ -682,7 +682,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "Self-Powered",
@@ -765,7 +765,7 @@
             "type": "influxdb",
             "uid": "${DS_INFLUXDB}"
           },
-          "query": "SELECT fp FROM (SELECT sum(\"from_pw\")  * 0.19 AS fp FROM kwh.http WHERE  $timeFilter tz('America/Los_Angeles'))",
+          "query": "SELECT fp FROM (SELECT sum(\"from_pw\")  * 0.19 AS fp FROM kwh.http WHERE  $timeFilter tz('America/Detroit'))",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -777,7 +777,7 @@
             "uid": "${DS_INFLUXDB}"
           },
           "hide": false,
-          "query": "SELECT s - (tp + tg) FROM (SELECT sum(\"solar\") * 0.19 AS s,  sum(\"to_pw\")  * 0.19 AS tp, sum(\"to_grid\") * 0.19 AS tg FROM kwh.http WHERE  $timeFilter tz('America/Los_Angeles'))\n",
+          "query": "SELECT s - (tp + tg) FROM (SELECT sum(\"solar\") * 0.19 AS s,  sum(\"to_pw\")  * 0.19 AS tp, sum(\"to_grid\") * 0.19 AS tg FROM kwh.http WHERE  $timeFilter tz('America/Detroit'))\n",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
@@ -789,7 +789,7 @@
             "uid": "${DS_INFLUXDB}"
           },
           "hide": false,
-          "query": "SELECT tg FROM (SELECT sum(\"to_pw\")  * 0.19 AS tp, sum(\"solar\") * 0.19 AS s, sum(\"to_grid\") * 0.19 AS tg FROM kwh.http WHERE  $timeFilter tz('America/Los_Angeles'))\n",
+          "query": "SELECT tg FROM (SELECT sum(\"to_pw\")  * 0.19 AS tp, sum(\"solar\") * 0.19 AS s, sum(\"to_grid\") * 0.19 AS tg FROM kwh.http WHERE  $timeFilter tz('America/Detroit'))\n",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "time_series"
@@ -801,7 +801,7 @@
             "uid": "${DS_INFLUXDB}"
           },
           "hide": false,
-          "query": "SELECT tg + (s - tp - tg ) + fp FROM (SELECT sum(\"to_pw\")  * 0.19 AS tp, sum(\"solar\") * 0.19 AS s, sum(\"to_grid\") * 0.19 AS tg, sum(\"from_pw\") * 0.19 AS fp FROM kwh.http WHERE  $timeFilter tz('America/Los_Angeles'))\n",
+          "query": "SELECT tg + (s - tp - tg ) + fp FROM (SELECT sum(\"to_pw\")  * 0.19 AS tp, sum(\"solar\") * 0.19 AS s, sum(\"to_grid\") * 0.19 AS tg, sum(\"from_pw\") * 0.19 AS fp FROM kwh.http WHERE  $timeFilter tz('America/Detroit'))\n",
           "rawQuery": true,
           "refId": "D",
           "resultFormat": "time_series"
@@ -1138,7 +1138,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "Home Usage",
@@ -1241,7 +1241,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "From Powerwall",
@@ -1344,7 +1344,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "From Grid",
@@ -1448,7 +1448,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "Solar Energy",
@@ -1551,7 +1551,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "To Powerwall",
@@ -1654,7 +1654,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "title": "To Grid",
@@ -1766,7 +1766,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "thresholds": [],
@@ -1901,7 +1901,7 @@
               "value": "0"
             }
           ],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "thresholds": [],
@@ -2030,7 +2030,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "thresholds": [],
@@ -2167,7 +2167,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "alias": "To Grid",
@@ -2216,7 +2216,7 @@
             ]
           ],
           "tags": [],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "thresholds": [],
@@ -2368,7 +2368,7 @@
               "value": "0"
             }
           ],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         },
         {
           "alias": "Home Usage",
@@ -2417,7 +2417,7 @@
               "value": "0"
             }
           ],
-          "tz": "America/Los_Angeles"
+          "tz": "America/Detroit"
         }
       ],
       "thresholds": [],

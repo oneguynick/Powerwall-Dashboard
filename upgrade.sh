@@ -13,11 +13,11 @@ if [ -f VERSION ]; then
 fi
 
 # Verify not running as root
-if [ "$EUID" -eq 0 ]; then 
+if [ "$EUID" -eq 0 ]; then
   echo "ERROR: Running this as root will cause permission issues."
   echo ""
-  echo "Please ensure your local user in in the docker group and run without sudo."
-  echo "   sudo usermod -aG docker \$USER"
+  echo "Please ensure your local user in in the podman group and run without sudo."
+  echo "   sudo usermod -aG podman \$USER"
   echo "   $0"
   echo ""
   exit 1
@@ -69,14 +69,14 @@ then
     echo ""
 else
     echo "Cancel"
-    exit 
+    exit
 fi
 
 # Remember Timezome and Reset to Default
 echo "Resetting Timezone to Default..."
 DEFAULT="America/Los_Angeles"
 TZ=`cat tz`
-if [ -z "${TZ}" ]; then 
+if [ -z "${TZ}" ]; then
     TZ="America/Los_Angeles"
 fi
 ./tz.sh "${DEFAULT}"
@@ -103,14 +103,14 @@ if ! grep -q "yesoreyeram-boomtable-panel-1.5.0-alpha.3.zip" grafana.env; then
         cp "grafana.env" "grafana.env.bak"
         cp "grafana.env.sample" "grafana.env"
         echo "Updated"
-        docker stop grafana
-        docker rm grafana
+        podman stop grafana
+        podman rm grafana
     else
         echo "No Change"
     fi
 fi
 
-# Silently create default docker compose env file if needed.
+# Silently create default podman compose env file if needed.
 if [ ! -f ${COMPOSE_ENV_FILE} ]; then
     cp "${COMPOSE_ENV_FILE}.sample" "${COMPOSE_ENV_FILE}"
 fi
@@ -145,7 +145,7 @@ echo ""
 echo "Start Powerwall-Dashboard stack..."
 ./compose-dash.sh up -d
 
-# Set Timezone 
+# Set Timezone
 echo ""
 echo "Setting Timezone back to ${TZ}..."
 ./tz.sh "${TZ}"
@@ -161,12 +161,12 @@ echo " up!"
 sleep 2
 echo ""
 echo "Add downsample continuous queries to InfluxDB..."
-docker exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/influxdb.sql"
+podman exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/influxdb.sql"
 cd influxdb
-for f in run-once*.sql; do 
+for f in run-once*.sql; do
     if [ ! -f "${f}.done" ]; then
-        echo "Executing single run query $f file..."; 
-        docker exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/${f}"
+        echo "Executing single run query $f file...";
+        podman exec --tty influxdb sh -c "influx -import -path=/var/lib/influxdb/${f}"
         echo "OK" > "${f}.done"
     fi
 done
@@ -175,23 +175,23 @@ cd ..
 # Delete pyPowerwall for Upgrade
 echo ""
 echo "Delete and Upgrade pyPowerwall to Latest"
-docker stop pypowerwall
-docker rm pypowerwall
-docker images | grep pypowerwall | awk '{print $3}' | xargs docker rmi -f
+podman stop pypowerwall
+podman rm pypowerwall
+podman images | grep pypowerwall | awk '{print $3}' | xargs podman rmi -f
 
 # Delete telegraf for Upgrade
 echo ""
 echo "Delete and Upgrade telegraf to Latest"
-docker stop telegraf
-docker rm telegraf
-docker images | grep telegraf | awk '{print $3}' | xargs docker rmi -f
+podman stop telegraf
+podman rm telegraf
+podman images | grep telegraf | awk '{print $3}' | xargs podman rmi -f
 
 # Delete weather411 for Upgrade
 echo ""
 echo "Delete and Upgrade weather411 to Latest"
-docker stop weather411
-docker rm weather411
-docker images | grep weather411 | awk '{print $3}' | xargs docker rmi -f
+podman stop weather411
+podman rm weather411
+podman images | grep weather411 | awk '{print $3}' | xargs podman rmi -f
 
 # Restart Stack
 echo ""
@@ -202,14 +202,14 @@ echo "Restarting Powerwall-Dashboard stack..."
 cat << EOF
 
 ---------------[ Update Dashboard ]---------------
-Open Grafana at http://localhost:9000/ 
+Open Grafana at http://localhost:9000/
 
 From 'Dashboard/Browse', select 'New/Import', and
-upload 'dashboard.json' from the path below.  
+upload 'dashboard.json' from the path below.
 
 Please note, you may need to select data sources
-for 'InfluxDB' and 'Sun and Moon' via the 
-dropdowns and use 'Import (Overwrite)' button.  
+for 'InfluxDB' and 'Sun and Moon' via the
+dropdowns and use 'Import (Overwrite)' button.
 
 Use dashboard.json located in: ${PWD}
 
